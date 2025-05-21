@@ -18,7 +18,7 @@ A Unity-based swarm simulation where autonomous robot agents cooperate, share kn
 ## 📁 Repository Structure
 
 ```bash
-/Your-Repo-Name
+/Empathetic-Robot-Simulator-in-Unity
 ├── Assets/                # Unity project folder
 │   ├── Scripts
 │   │   ├── Robot.cs
@@ -53,8 +53,8 @@ A Unity-based swarm simulation where autonomous robot agents cooperate, share kn
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/YourUsername/Your-Repo-Name.git
-cd Your-Repo-Name
+git clone https://github.com/JerKwi1/Empathetic-Robot-Simulator-in-Unity.git
+cd Empathetic-Robot-Simulator-in-Unity
 ```
 
 ### Open in Unity
