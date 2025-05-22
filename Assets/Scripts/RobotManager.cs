@@ -7,8 +7,8 @@ public class RobotManager : MonoBehaviour
 {
     public GameObject robotPrefab;
     public int numberOfRobots = 5;
-    public Transform groundPlane; // Assign the ground plane in the Inspector
-    public Transform foodSource;  // ✅ Add this to assign the food source
+    public Transform groundPlane;
+    public Transform foodSource;
     public Vector3 spawnAreaSize = new Vector3(10f, 1f, 10f);
     public bool useBaseKnowledge = false;
     public bool useReinforcementLearning = true;
@@ -18,7 +18,7 @@ public class RobotManager : MonoBehaviour
     public int maxMemoryCount = 10;
     [HideInInspector]
     public bool showFOV = false;
-    public int maxSimulations = 3; // Number of times to reset the simulation
+    public int maxSimulations = 3;
     private int currentSimulation = 0;
     private static string logFilePath;
     private bool simulationStarted = false;
@@ -40,7 +40,7 @@ public class RobotManager : MonoBehaviour
         }
         if (foodSource == null)
         {
-            Debug.LogError("Food source not assigned in RobotManager"); // ✅ Prevents crashes
+            Debug.LogError("Food source not assigned in RobotManager"); // Prevents crashes
             return;
         }
     }
