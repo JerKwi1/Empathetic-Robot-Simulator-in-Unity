@@ -28,16 +28,13 @@ A Unity-based swarm simulation where autonomous robot agents cooperate, share kn
 │   │   ├── DebugSimulationUI.cs
 │   │   └── CameraController.cs
 │   └── ...                # Other Unity assets (Scenes, Prefabs, Materials)
-├── Build/                 # Compiled application (Windows/Mac/Linux)
-│   └── RobotSwarm.exe     # Example; your actual executable here
 ├── Documentation/         # LaTeX docs and generated PDF
 │   ├── TechnicalDocumentation.tex
 │   ├── TechnicalDocumentation.pdf
 │   ├── MaintenanceDocumentation.tex
 │   └── MaintenanceDocumentation.pdf
 ├── .gitignore
-├── README.md              # ← You are here
-└── LICENSE
+└── README.md              # ← You are here
 ```
 
 ---
@@ -98,11 +95,3 @@ See [Documentation/MaintenanceDocumentation.pdf](Documentation/MaintenanceDocume
 - Advanced RL (DQN, multi-agent frameworks)
 - Extended empathy/social network modeling
 - CI/CD with automated testing and builds
-
-Contributions are welcome! Please open issues or submit pull requests.
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
