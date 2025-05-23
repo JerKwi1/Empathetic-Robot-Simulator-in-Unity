@@ -4,16 +4,21 @@ using System.Collections.Generic;
 
 public class KnowledgePersistence
 {
-    private readonly string path;
+    private readonly string loadPath;
+    private readonly string savePath;
 
-    public KnowledgePersistence(string robotId)
+    public KnowledgePersistence(string loadFileName, string saveFileName = null)
     {
-        path = Path.Combine(Application.persistentDataPath, $"robot_{robotId}_qtable.json");
+        loadPath = Path.Combine(Application.persistentDataPath, loadFileName);
+        savePath = saveFileName != null
+            ? Path.Combine(Application.persistentDataPath, saveFileName)
+            : null;
     }
 
     // Save the flat Q-table
     public void SaveQTable(Dictionary<(int state, int action), float> qTable)
     {
+        if (savePath == null) return;      // skip in eval mode
         var data = new QTableData();
         foreach (var kv in qTable)
         {
@@ -25,22 +30,21 @@ public class KnowledgePersistence
         }
 
         string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(path, json);
-        Debug.Log($"[Persistence] Saved Q-table ({qTable.Count} entries) to {path}");
+        File.WriteAllText(savePath, json);
+        Debug.Log($"[Persistence] Saved model ({qTable.Count} entries) to {savePath}");
     }
 
     // Load into a flat Q-table
     public void LoadQTable(out Dictionary<(int state, int action), float> qTable)
     {
-        qTable = new Dictionary<(int state, int action), float>();
-
-        if (!File.Exists(path))
+        qTable = new Dictionary<(int,int),float>();
+        if (!File.Exists(loadPath))
         {
-            Debug.Log($"[Persistence] No Q-table found at {path}; starting empty.");
+            Debug.Log($"[Persistence] No base model at {loadPath}; starting empty.");
             return;
         }
 
-        string json = File.ReadAllText(path);
+        string json = File.ReadAllText(loadPath);
         var data = JsonUtility.FromJson<QTableData>(json);
 
         foreach (var e in data.entries)
@@ -50,6 +54,6 @@ public class KnowledgePersistence
                 qTable[key] = e.value;
         }
 
-        Debug.Log($"[Persistence] Loaded Q-table ({qTable.Count} entries) from {path}");
+        Debug.Log($"[Persistence] Loaded model ({qTable.Count} entries) from {loadPath}");
     }
 }

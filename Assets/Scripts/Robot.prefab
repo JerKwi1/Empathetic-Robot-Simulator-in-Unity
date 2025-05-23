@@ -171,6 +171,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74ed4d282e6603249a744d9140490224, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isTrainingMode: 1
+  robotId: 
   detectionRange: 20
   moveSpeed: 3.5
   wanderRadius: 10
@@ -181,5 +183,8 @@ MonoBehaviour:
   foundFoodColor: {r: 0, g: 1, b: 0, a: 1}
   obstacleDetectedColor: {r: 1, g: 0, b: 0, a: 1}
   fieldOfViewAngle: 60
+  showFOV: 0
+  fovSegments: 20
+  useReinforcementLearning: 1
   memoryRadius: 1
   maxMemoryCount: 10

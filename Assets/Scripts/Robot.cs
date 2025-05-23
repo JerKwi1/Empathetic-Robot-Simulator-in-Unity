@@ -19,11 +19,14 @@ public struct FuzzyState {
 
 public class Robot : MonoBehaviour
 {
+    private const string MODEL_FILE = "trained_model.json";
+    [Tooltip("If true, run in training mode (will overwrite MODEL_FILE on exit). " + "If false, load MODEL_FILE but do not save it.")]
+    public bool isTrainingMode = true;
     // === Existing Public Fields ===
     public string robotId;  // e.g. set per-instance in the Inspector
     private KnowledgePersistence persistence;
     // flat (state,action) → Q-value
-    private Dictionary<(int state, int action), float> qTable;
+    private static Dictionary<(int state, int action), float> qTable;
 
     public float detectionRange = 10f;
     public float moveSpeed = 3.5f;
@@ -189,12 +192,25 @@ public class Robot : MonoBehaviour
 
     void Awake()
     {
-        persistence = new KnowledgePersistence(robotId);
-        persistence.LoadQTable(out qTable);
+        if (qTable == null)
+        {
+            persistence = new KnowledgePersistence(
+                MODEL_FILE,
+                isTrainingMode ? MODEL_FILE : null
+            );
+            persistence.LoadQTable(out qTable);
+        }
     }
 
-    void OnDestroy()
+    void OnApplicationQuit()
     {
+        if (isTrainingMode)
+            persistence.SaveQTable(qTable);
+    }
+
+    public static void SaveModelNow()
+    {
+        var persistence = new KnowledgePersistence(MODEL_FILE, MODEL_FILE);
         persistence.SaveQTable(qTable);
     }
 

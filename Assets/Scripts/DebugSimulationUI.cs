@@ -45,6 +45,7 @@ public class DebugSimulationUI : MonoBehaviour
             }
             if (GUILayout.Button("⟳ Reset Simulation"))
             {
+                Robot.SaveModelNow();
                 RobotManager.Instance.ResetToInitial();
                 isSimulationRunning = false;
             }
@@ -53,6 +54,7 @@ public class DebugSimulationUI : MonoBehaviour
         {
             if (GUILayout.Button("■ Stop Simulation"))
             {
+                Robot.SaveModelNow();
                 RobotManager.Instance.ResetToInitial();
                 isSimulationRunning = false;
             }
