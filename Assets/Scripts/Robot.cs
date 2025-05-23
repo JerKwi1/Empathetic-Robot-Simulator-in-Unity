@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using System.IO;
+using Random = UnityEngine.Random;
 
 // A simple struct representing a fuzzy state for the robot.
 public struct FuzzyState {
@@ -18,6 +20,11 @@ public struct FuzzyState {
 public class Robot : MonoBehaviour
 {
     // === Existing Public Fields ===
+    public string robotId;  // e.g. set per-instance in the Inspector
+    private KnowledgePersistence persistence;
+    // flat (state,action) → Q-value
+    private Dictionary<(int state, int action), float> qTable;
+
     public float detectionRange = 10f;
     public float moveSpeed = 3.5f;
     public float wanderRadius = 10f;
@@ -55,7 +62,7 @@ public class Robot : MonoBehaviour
 
     // === RL-Specific Fields ===
     // Q-table: mapping (state, action) pair to Q-value.
-    private Dictionary<(int, int), float> qTable = new Dictionary<(int, int), float>();
+    ///private Dictionary<(int, int), float> qTable = new Dictionary<(int, int), float>();
 
     // Parameters for Q-learning.
     private float learningRate = 0.1f;
@@ -178,6 +185,17 @@ public class Robot : MonoBehaviour
             fovRenderer.enabled = showFOV;
             if (showFOV) DrawFOV();
         }
+    }
+
+    void Awake()
+    {
+        persistence = new KnowledgePersistence(robotId);
+        persistence.LoadQTable(out qTable);
+    }
+
+    void OnDestroy()
+    {
+        persistence.SaveQTable(qTable);
     }
 
     void DrawFOV()
