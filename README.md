@@ -28,11 +28,8 @@ A Unity-based swarm simulation where autonomous robot agents cooperate, share kn
 │   │   ├── DebugSimulationUI.cs
 │   │   └── CameraController.cs
 │   └── ...                # Other Unity assets (Scenes, Prefabs, Materials)
-├── Documentation/         # LaTeX docs and generated PDF
-│   ├── TechnicalDocumentation.tex
-│   ├── TechnicalDocumentation.pdf
-│   ├── MaintenanceDocumentation.tex
-│   └── MaintenanceDocumentation.pdf
+├── Documentation/         # PDF Files
+│   └── TechnicalDocumentation.pdf
 ├── .gitignore
 └── README.md              # ← You are here
 ```
