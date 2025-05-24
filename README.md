@@ -61,7 +61,7 @@ cd Empathetic-Robot-Simulator-in-Unity
 
 ### Run the Compiled Build
 
-1. Navigate to the `Build` folder.
+1. Navigate to Realeses and download latest zip file.
 2. On Windows, double-click `RobotSwarm.exe`.
 3. On Mac/Linux, run the appropriate executable or shell script.
 
