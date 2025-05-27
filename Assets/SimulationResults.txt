@@ -1,0 +1,5 @@
+Simulation 1 completed in 2400,418 seconds.
+Simulation 1 completed in 17,31137 seconds.
+Simulation 1 completed in 187,351 seconds.
+Simulation 1 completed in 30,29612 seconds.
+Simulation 2 completed in 34,79599 seconds.

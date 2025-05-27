@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using System.IO;
+using System.Linq;
 using Random = UnityEngine.Random;
 
 // A simple struct representing a fuzzy state for the robot.
@@ -27,6 +28,19 @@ public class Robot : MonoBehaviour
     private KnowledgePersistence persistence;
     // flat (state,action) → Q-value
     private static Dictionary<(int state, int action), float> qTable;
+
+    private Vector3 lastPosition;
+    private float stuckTimer = 0f;
+
+    [SerializeField]
+    private float stuckTimeThreshold = 2f;  // seconds before we assume “stuck”
+
+    // track which discrete states we’ve seen already
+    private HashSet<int> visitedStates = new HashSet<int>();
+
+    [Tooltip("Penalty added to reward when revisiting the same state")]
+    [SerializeField]
+    private float visitedStatePenalty = -1f; 
 
     public float detectionRange = 10f;
     public float moveSpeed = 3.5f;
@@ -148,6 +162,12 @@ public class Robot : MonoBehaviour
         {
             // Get the new state.
             int newState = GetState();
+
+            // have we been here before?
+            bool isRevisit = visitedStates.Contains(newState);
+            // if not, record it
+            if (!isRevisit) 
+                visitedStates.Add(newState);
             
             // Calculate reward using the specified mathematical formula.
             // Here we use an exponential decay formula based on the change in distance to food:
@@ -162,6 +182,10 @@ public class Robot : MonoBehaviour
             {
                 reward += 10f;
             }
+
+            // penalize revisiting the same bin
+            if (isRevisit)
+                reward += visitedStatePenalty;
             
             // Q-learning update: Get max Q-value for the new state.
             float maxQNext = float.MinValue;
@@ -180,9 +204,48 @@ public class Robot : MonoBehaviour
             previousPosition = transform.position;
             
             // Compute the new destination based on the chosen action.
-            Vector3 newDestination = ComputeDestinationFromAction(currentAction);
+            // Vector3 newDestination = ComputeDestinationFromAction(currentAction);
+            // agent.SetDestination(newDestination);
+
+            Vector3 newDestination;
+            int safety = 0;
+            do {
+                newDestination = ComputeDestinationFromAction(currentAction);
+                // if this spot is “bad,” pick a fresh action
+                if ( IsVisited(newDestination) || IsPointInNoFoodArea(newDestination) ) {
+                currentAction = ChooseAction(newState);
+                safety++;
+                } else {
+                break;
+                }
+            } while (safety < 10);
+
+            // record it as visited
+            visitedLocations.Add(newDestination);
+            if (visitedLocations.Count > maxMemoryCount)
+                visitedLocations.RemoveAt(0);
+
             agent.SetDestination(newDestination);
         }
+
+        float deltaMove = Vector3.Distance(transform.position, lastPosition);
+
+        if (agent.hasPath && agent.remainingDistance > 0.1f && deltaMove < 0.01f)
+            stuckTimer += Time.deltaTime;
+        else
+            stuckTimer = 0f;
+
+        if (stuckTimer > stuckTimeThreshold)
+        {
+            Vector3 rescue = GetNewExplorationPoint();
+            if (NavMesh.SamplePosition(rescue, out var navHit, wanderRadius, NavMesh.AllAreas))
+                agent.SetDestination(navHit.position);
+            stuckTimer = 0f;
+        }
+
+        // Remember for next frame
+        lastPosition = transform.position;
+
         if (fovRenderer != null)
         {
             fovRenderer.enabled = showFOV;
@@ -194,11 +257,14 @@ public class Robot : MonoBehaviour
     {
         if (qTable == null)
         {
+            visitedStates.Clear();
             persistence = new KnowledgePersistence(
                 MODEL_FILE,
                 isTrainingMode ? MODEL_FILE : null
             );
             persistence.LoadQTable(out qTable);
+            lastPosition = transform.position;
+
         }
     }
 
@@ -413,9 +479,13 @@ public class Robot : MonoBehaviour
             SaveFoodLocation(lastKnownFoodLocation);
             CheckSimulationEnd();
         }
-        else if (other.CompareTag("Obstacle"))
+        else if (other.CompareTag("Obstacle") || other.CompareTag("Robot"))
         {
-            AvoidObstacle();
+            // immediately steer away from collisions
+            Vector3 away = (transform.position - other.transform.position).normalized;
+            Vector3 target = transform.position + away * wanderRadius;
+            if (NavMesh.SamplePosition(target, out var navHit, wanderRadius, NavMesh.AllAreas))
+                agent.SetDestination(navHit.position);
         }
     }
 
@@ -488,27 +558,29 @@ public class Robot : MonoBehaviour
 
     // Epsilon-greedy action selection.
     int ChooseAction(int state)
-    {
-        if (Random.value < explorationRate)
-        {
-            return Random.Range(0, numActions);
-        }
-        else
-        {
-            float maxQ = float.MinValue;
-            int bestAction = 0;
-            for (int a = 0; a < numActions; a++)
-            {
-                float q = GetQValue(state, a);
-                if (q > maxQ)
-                {
-                    maxQ = q;
-                    bestAction = a;
-                }
-            }
-            return bestAction;
-        }
-    }
+{
+    // 1) Exploration: pick a random action with probability epsilon
+    if (Random.value < explorationRate)
+        return Random.Range(0, numActions);
+
+    // 2) Exploitation: find the highest Q-value
+    //    First compute the max Q
+    float maxQ = Enumerable
+        .Range(0, numActions)
+        .Select(a => GetQValue(state, a))
+        .Max();
+
+    // 3) Collect all actions that tie for maxQ
+    var bestActions = Enumerable
+        .Range(0, numActions)
+        .Where(a => Mathf.Approximately(GetQValue(state, a), maxQ))
+        .ToList();
+
+    // 4) Pick one of the tied actions at random
+    int choice = bestActions[ Random.Range(0, bestActions.Count) ];
+    return choice;
+}
+
 
     float GetQValue(int state, int action)
     {
