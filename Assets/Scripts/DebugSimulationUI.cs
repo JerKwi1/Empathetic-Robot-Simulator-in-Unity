@@ -22,7 +22,7 @@ public class DebugSimulationUI : MonoBehaviour
         numberOfRobots = (int)GUILayout.HorizontalSlider(numberOfRobots, 1, 100);
 
         GUILayout.Label($"Max Runs: {maxSimulations}");
-        maxSimulations = (int)GUILayout.HorizontalSlider(maxSimulations, 1, 10);
+        maxSimulations = (int)GUILayout.HorizontalSlider(maxSimulations, 1, 1000);
 
         GUILayout.Space(10);
         GUILayout.Label($"Memory Radius: {memoryRadius:F1}");
