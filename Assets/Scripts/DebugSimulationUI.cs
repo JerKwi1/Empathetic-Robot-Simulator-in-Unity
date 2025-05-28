@@ -10,12 +10,16 @@ public class DebugSimulationUI : MonoBehaviour
     private float memoryRadius = 1f;
     private int   maxMemoryCount = 10;
     private bool  showFOV = false;
+    private bool uiTrainingMode = true;
+    private bool uiUseReinforcement = true;
+    private bool uiUseBaseKnowledge = false;
+    private bool uiUseEmpathy = true;
 
     void OnGUI()
     {
         GUILayout.BeginArea(new Rect(10, 10, 320, 400), "Simulation Controls", GUI.skin.window);
         useReinforcementLearning = GUILayout.Toggle(useReinforcementLearning, "Use Reinforcement Learning");
-        useBaseKnowledge         = GUILayout.Toggle(useBaseKnowledge,         "Use Base Knowledge");
+        useBaseKnowledge = GUILayout.Toggle(useBaseKnowledge, "Use Base Knowledge");
 
 
         GUILayout.Label($"Robots: {numberOfRobots}");
@@ -33,6 +37,18 @@ public class DebugSimulationUI : MonoBehaviour
 
         GUILayout.Space(10);
         showFOV = GUILayout.Toggle(showFOV, "Show Field of View");
+        
+        GUILayout.BeginVertical("box");
+        uiTrainingMode = GUILayout.Toggle(uiTrainingMode, "Training Mode");
+        uiUseReinforcement = GUILayout.Toggle(uiUseReinforcement, "Use Reinforcement Learning");
+        uiUseBaseKnowledge = GUILayout.Toggle(uiUseBaseKnowledge, "Use Base Knowledge");
+        uiUseEmpathy = GUILayout.Toggle(uiUseEmpathy, "Use Empathetic Behavior");
+        GUILayout.EndVertical();
+
+        if (GUI.changed)
+        {
+            ApplyTogglesToRobots();
+        }
 
         GUILayout.Space(10);
         if (!isSimulationRunning)
@@ -61,6 +77,19 @@ public class DebugSimulationUI : MonoBehaviour
         }
 
         GUILayout.EndArea();
+    }
+
+    private void ApplyTogglesToRobots()
+    {
+        var all = FindObjectsOfType<Robot>();
+        foreach (var r in all)
+        {
+            r.isTrainingMode = uiTrainingMode;
+            r.useReinforcementLearning = uiUseReinforcement;
+            r.useBaseKnowledge = uiUseBaseKnowledge;
+            r.useEmpatheticBehavior = uiUseEmpathy;
+        }
+        Debug.Log($"[UI] Applied toggles → Training:{uiTrainingMode}  RL:{uiUseReinforcement}  BaseKB:{uiUseBaseKnowledge}  Empathy:{uiUseEmpathy}");
     }
 
     void ApplySettings()
