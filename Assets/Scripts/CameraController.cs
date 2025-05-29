@@ -43,7 +43,7 @@ public class CameraController : MonoBehaviour
 
         if (isPanning)
         {
-            // ─── Rotation ───
+            // Rotation
             float mx = Input.GetAxis("Mouse X");
             float my = Input.GetAxis("Mouse Y");
             yaw   += mx * rotationSpeed * Time.deltaTime;

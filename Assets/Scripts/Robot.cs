@@ -9,8 +9,8 @@ using Random = UnityEngine.Random;
 
 // A simple struct representing a fuzzy state for the robot.
 public struct FuzzyState {
-    public float internalValue; // e.g. representing internal capability or energy level
-    public float externalValue; // e.g. representing the distance to the food source
+    public float internalValue;
+    public float externalValue;
 
     public FuzzyState(float internalValue, float externalValue) {
         this.internalValue = internalValue;
@@ -23,48 +23,42 @@ public class Robot : MonoBehaviour
     private const string MODEL_FILE = "trained_model.json";
     [Tooltip("If true, run in training mode (will overwrite MODEL_FILE on exit). " + "If false, load MODEL_FILE but do not save it.")]
     public bool isTrainingMode = true;
-    // === Existing Public Fields ===
-    public string robotId;  // e.g. set per-instance in the Inspector
+    public string robotId;
     private KnowledgePersistence persistence;
-    // flat (state,action) → Q-value
     private static Dictionary<(int state, int action), float> qTable;
 
     private Vector3 lastPosition;
     private float stuckTimer = 0f;
 
-    [SerializeField]
     private float stuckTimeThreshold = 2f;  // seconds before we assume “stuck”
 
     // track which discrete states we’ve seen already
     private HashSet<int> visitedStates = new HashSet<int>();
 
     [Tooltip("Penalty added to reward when revisiting the same state")]
-    [SerializeField]
     private float visitedStatePenalty = -1f; 
 
     public float detectionRange = 10f;
     public float moveSpeed = 3.5f;
     public float wanderRadius = 10f;
     public bool useBaseKnowledge = false;
-    public bool useEmpatheticBehavior = true; // Toggle to enable empathetic sharing and no-food memory
+    public bool useEmpatheticBehavior = true;
     public Transform foodSource;
     public Color searchingColor = Color.blue;
     public Color foundFoodColor = Color.green;
     public Color obstacleDetectedColor = Color.red;
-    public float fieldOfViewAngle = 60f; // Field of view angle for vision
+    public float fieldOfViewAngle = 60f;
     [HideInInspector]
     public bool showFOV = false;
     public int fovSegments = 20;
-    
-    // === RL Integration Flag ===
-    public bool useReinforcementLearning = true; // Toggle RL-based behavior
 
-    // === Existing Private Fields ===
+    public bool useReinforcementLearning = true;
+
     private NavMeshAgent agent;
     private bool foodFound = false;
     private static Vector3 lastKnownFoodLocation = Vector3.zero;
     private Renderer robotRenderer;
-    private List<Vector3> visitedLocations = new List<Vector3>(); // Stores visited locations
+    private List<Vector3> visitedLocations = new List<Vector3>();
     private static int robotsThatFoundFood = 0;
     private static float simulationStartTime;
 
@@ -171,7 +165,6 @@ public class Robot : MonoBehaviour
             
             // Calculate reward using the specified mathematical formula.
             // Here we use an exponential decay formula based on the change in distance to food:
-            // reward = exp(–λ * previousDistance) – exp(–λ * currentDistance)
             float lambda = 0.1f;
             float previousDistance = Vector3.Distance(previousPosition, foodSource.position);
             float currentDistance = Vector3.Distance(transform.position, foodSource.position);
@@ -204,9 +197,6 @@ public class Robot : MonoBehaviour
             previousPosition = transform.position;
             
             // Compute the new destination based on the chosen action.
-            // Vector3 newDestination = ComputeDestinationFromAction(currentAction);
-            // agent.SetDestination(newDestination);
-
             Vector3 newDestination;
             int safety = 0;
             do {
@@ -297,7 +287,6 @@ public class Robot : MonoBehaviour
         }
     }
 
-    // === Existing Methods (ContinuousMovement, Wander, etc.) ===
     IEnumerator ContinuousMovement()
     {
         while (!foodFound)
@@ -612,7 +601,7 @@ public class Robot : MonoBehaviour
         return destination;
     }
 
-    // === Gizmo Drawing (Optional) ===
+    // === Gizmo Drawing ===
     void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;

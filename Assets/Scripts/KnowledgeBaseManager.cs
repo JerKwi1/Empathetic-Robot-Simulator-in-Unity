@@ -12,7 +12,7 @@ public static class KnowledgeBaseManager
     private static List<Vector3> foodLocations = new List<Vector3>();
     private static List<Vector3> noFoodAreas = new List<Vector3>();
 
-    // ───── Food Locations Methods ─────
+    // Food Locations Methods
 
     public static void LoadKnowledgeBase()
     {
@@ -62,7 +62,7 @@ public static class KnowledgeBaseManager
         return Vector3.zero;
     }
 
-    // ───── No-Food Areas Methods ─────
+    // No-Food Areas Methods
 
     public static void LoadNoFoodAreas()
     {

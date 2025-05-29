@@ -122,7 +122,7 @@ public class RobotManager : MonoBehaviour
         return true;
     }
 
-    // ───── Restart Simulation Coroutine ─────
+    // Restart Simulation
     public IEnumerator RestartSimulation()
     {
         if (currentSimulation < maxSimulations)
